@@ -40,8 +40,13 @@ class KafkaConfig {
 
   async createTopic(topic: string) {
     try {
-      await this.admin.createTopics({ waitForLeaders: true, timeout: 5000, topics: [{ topic, numPartitions: 1 }] });
-      console.log("topic created... ");
+      const existingTopics = await this.admin.listTopics();
+      if (existingTopics.length == 0 || !existingTopics.includes(topic)) {
+        await this.admin.createTopics({ waitForLeaders: true, timeout: 5000, topics: [{ topic, numPartitions: 1 }] });
+        console.log("topic created... ");
+      } else {
+        console.log("topic already exists... ");
+      }
     } catch (error) {
       console.log("TOPIC CREATION ERROR ... ", error);
       process.exit(1);
