@@ -5,16 +5,27 @@ class KafkaConfig {
   private kafka: Kafka;
   private admin: Admin;
   private brokers: string;
+  private producer: Producer;
   constructor() {
     this.brokers = `${ip.address()!}:9092`;
     // this.brokers = "192.168.1.3:9092";
     console.log("brokers", ip.address());
     this.kafka = new Kafka({
       clientId: "post-producer",
-      brokers: [this.brokers, "kafka:9092"],
+      brokers: [this.brokers, "localhost:9092", "localhost:8081"],
       logLevel: logLevel.ERROR,
+      connectionTimeout: 3000,
+      retry: {
+        initialRetryTime: 100,
+        retries: 10,
+      },
     });
     this.admin = this.kafka.admin();
+    this.producer = this.kafka.producer({
+      retry: {
+        initialRetryTime: 10,
+      },
+    });
   }
 
   async connect() {
@@ -32,14 +43,17 @@ class KafkaConfig {
       console.log("topic created... ");
     } catch (error) {
       console.log("TOPIC CREATION ERROR ... ", error);
+      process.exit(1);
     }
   }
 
   async sentToTopic(topic: string, message: string) {
     try {
-      this.kafka.producer().send({ topic, messages: [{ value: message }] });
+      this.connect();
+      this.producer.send({ topic, messages: [{ value: message }] });
+      console.log("message sent to topic... ");
     } catch (error) {
-      console.log("topic sent error... ");
+      console.log("topic sent error... ", error);
     }
   }
 
