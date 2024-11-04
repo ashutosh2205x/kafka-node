@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const postSchema = z.object({
   title: z.string(),
-  body: z.string().nonempty(),
+  body: z.string()
 });
 
 export default postSchema;
