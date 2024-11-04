@@ -31,6 +31,7 @@ class KafkaConfig {
   async connect() {
     try {
       await this.kafka.admin().connect();
+      await this.producer.connect();
       console.log("kafka connected... ");
     } catch (error) {
       console.log("kafa connected error... ", error);
@@ -48,8 +49,8 @@ class KafkaConfig {
   }
 
   async sentToTopic(topic: string, message: string) {
+    console.log("TOPIC: ", topic, message);
     try {
-      this.connect();
       this.producer.send({ topic, messages: [{ value: message }] });
       console.log("message sent to topic... ");
     } catch (error) {
