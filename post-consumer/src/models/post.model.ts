@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
 
-interface Post {
+export interface Post {
   title: string;
   body: string;
+  pid: string;
 }
 
 const postSchema = new mongoose.Schema<Post>({
@@ -13,6 +14,9 @@ const postSchema = new mongoose.Schema<Post>({
   body: {
     type: String,
     required: true,
+  },
+  pid: {
+    type: String,
   },
 });
 
